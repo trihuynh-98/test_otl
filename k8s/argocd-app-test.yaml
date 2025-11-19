@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tracing-app
+  namespace: argocd   # namespace cài ArgoCD
+spec:
+  project: default   # ArgoCD project
+  source:
+    repoURL: https://github.com/trihuynh-98/test-otl.git   
+    targetRevision: main                           
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tracing
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true 
