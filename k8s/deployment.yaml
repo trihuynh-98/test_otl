@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: tracing-app
-        image: ghcr.io/<OWNER>/tracing-app:latest
+        image: ghcr.io/trihuynh-98/tracing-app:latest
         ports:
         - containerPort: 5000
         env:

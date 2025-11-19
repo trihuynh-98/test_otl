@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: tracing-app
-  namespace: argocd   # namespace cài ArgoCD
+  namespace: argocd   # namespace ArgoCD
 spec:
   project: default   # ArgoCD project
   source:
