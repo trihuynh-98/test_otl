@@ -1,0 +1,50 @@
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Tempo
+        type: tempo
+        url: http://tempo.tracing.svc.cluster.local:4317
+        access: proxy
+      - name: Alloy
+        type: grafana-alloy
+        url: "<ALLOY_API_URL>"
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: 'default'
+        folder: ''
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards
+
+dashboards:
+  tracing-dashboard:
+    tracing-dashboard.json: |
+      {
+        "id": null,
+        "title": "Tracing Metrics",
+        "panels": [
+          {
+            "type": "graph",
+            "title": "Dropped vs Exported Spans",
+            "targets": [
+              {
+                "expr": "otelcol_exporter_spans_dropped_total",
+                "legendFormat": "dropped"
+              },
+              {
+                "expr": "otelcol_exporter_spans_sent_total",
+                "legendFormat": "exported"
+              }
+            ]
+          }
+        ]
+      }

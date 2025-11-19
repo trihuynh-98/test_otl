@@ -1,0 +1,20 @@
+image:
+  repository: grafana/tempo
+  tag: latest
+
+ingress:
+  enabled: false
+
+service:
+  ports:
+    - name: grpc
+      port: 4317
+    - name: metrics
+      port: 9090
+
+config:
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /tempo-data

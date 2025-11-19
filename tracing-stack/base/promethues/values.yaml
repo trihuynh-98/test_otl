@@ -1,0 +1,24 @@
+kubePrometheusStack:
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelector:
+        matchLabels:
+          app: otel-collector
+      additionalServiceMonitors:
+        - name: otel-collector-monitor
+          selector:
+            matchLabels:
+              app: otel-collector
+          endpoints:
+            - port: "8888"
+              interval: 10s
+        - name: tempo-monitor
+          selector:
+            matchLabels:
+              app: tempo
+          endpoints:
+            - port: "9090"
+              interval: 10s
+
+  grafana:
+    enabled: false  # disable Grafana from this stack if using separate Grafana App
