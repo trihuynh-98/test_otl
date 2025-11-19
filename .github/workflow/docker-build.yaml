@@ -1,0 +1,55 @@
+name: CI/CD Tracing App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Set up Docker Buildx for multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 3. Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 4. Build and push Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app
+          file: ./app/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/tracing-app:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/tracing-app:latest
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/tracing-app:cache,mode=max
+
+      # 5. Deploy to Kubernetes (using manifests in k8s/)
+      - name: Set up Kubeconfig
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.27.3'
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          kubectl apply -f k8s/ingress.yaml
+          kubectl set image deployment/tracing-app tracing-app=ghcr.io/${{ github.repository_owner }}/tracing-app:latest -n tracing

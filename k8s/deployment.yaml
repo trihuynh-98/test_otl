@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracing-app
+  namespace: tracing
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tracing-app
+  template:
+    metadata:
+      labels:
+        app: tracing-app
+    spec:
+      containers:
+      - name: tracing-app
+        image: ghcr.io/<OWNER>/tracing-app:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "otel-collector.tracing.svc.cluster.local:4317"
+        - name: OTEL_EXPORTER_OTLP_INSECURE
+          value: "true"

@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tracing-app
+  namespace: tracing
+spec:
+  rules:
+  - host: tracing.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tracing-app
+            port:
+              number: 80
